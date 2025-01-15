@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const port = process.env.PORT || 5000;
 
@@ -23,6 +23,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    const db = client.db("studyHive");
+    const userCollection = db.collection("users");
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
@@ -32,8 +35,39 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1h",
       });
-      console.log(token);
       res.send({ token });
+    });
+
+    // Save or Update a User
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+
+      // Check if user already exists
+      const existingUser = await userCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ success: false, message: "User already exists." });
+      }
+
+      // Insert new user with default role and timestamp
+      const result = await userCollection.insertOne({
+        ...user,
+        role: "student",
+        timestamp: new Date(),
+      });
+
+      res.send({ success: true, message: "User added successfully.", result });
+    });
+    app.get("/users",  async (req, res) => {
+      const email = req.query.email;
+      
+    
+      const user = await userCollection.findOne({ email });
+      if (!user) {
+        return res.status(404).send({ success: false, message: "User not found." });
+      }
+    
+      res.send({ success: true, role: user.role });
     });
 
     // Send a ping to confirm a successful connection
