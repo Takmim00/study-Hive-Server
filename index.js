@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const db = client.db("studyHive");
+    const tutorCollection = db.collection("tutors");
     const userCollection = db.collection("users");
 
     // Connect the client to the server	(optional starting in v4.7)
@@ -49,9 +50,10 @@ async function run() {
         return res.send({ success: false, message: "User already exists." });
       }
 
-      // Insert new user with default role and timestamp
       const result = await userCollection.insertOne({
-        ...user,
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
         role: user.role,
         timestamp: new Date(),
       });
@@ -69,6 +71,17 @@ async function run() {
       }
 
       res.send({ success: true, role: user.role });
+    });
+
+    app.get("/tutors", async (req, res) => {
+      const result = await tutorCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/tutors", async (req, res) => {
+      const tutorData = req.body;
+      const result = await tutorCollection.insertOne(tutorData);
+      console.log(tutorData);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
