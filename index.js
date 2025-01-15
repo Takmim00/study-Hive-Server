@@ -52,21 +52,22 @@ async function run() {
       // Insert new user with default role and timestamp
       const result = await userCollection.insertOne({
         ...user,
-        role: "student",
+        role: user.role,
         timestamp: new Date(),
       });
 
       res.send({ success: true, message: "User added successfully.", result });
     });
-    app.get("/users",  async (req, res) => {
+    app.get("/users", async (req, res) => {
       const email = req.query.email;
-      
-    
+
       const user = await userCollection.findOne({ email });
       if (!user) {
-        return res.status(404).send({ success: false, message: "User not found." });
+        return res
+          .status(404)
+          .send({ success: false, message: "User not found." });
       }
-    
+
       res.send({ success: true, role: user.role });
     });
 
