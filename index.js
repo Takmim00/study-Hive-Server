@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -101,6 +101,23 @@ async function run() {
       const result = await metarialCollection.insertOne(tutorData);
       res.send(result);
     });
+
+    app.get("/veiwMetarial", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await tutorCollection
+        .find(query)
+        .toArray();
+      res.send(result);
+    });
+    app.delete("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tutorCollection.deleteOne(query);
+      res.send(result);
+    });
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
