@@ -26,6 +26,7 @@ async function run() {
     const db = client.db("studyHive");
     const tutorCollection = db.collection("tutors");
     const userCollection = db.collection("users");
+    const metarialCollection = db.collection("metarial");
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
@@ -91,6 +92,15 @@ async function run() {
       res.send(sessions);
     });
 
+    app.get("/metarial", async (req, res) => {
+      const result = await metarialCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/metarial", async (req, res) => {
+      const tutorData = req.body;
+      const result = await metarialCollection.insertOne(tutorData);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
