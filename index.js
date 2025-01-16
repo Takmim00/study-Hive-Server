@@ -51,9 +51,9 @@ async function run() {
       }
 
       const result = await userCollection.insertOne({
-        name: user.displayName,
+        name: user.name,
         email: user.email,
-        photo: user.photoURL,
+        photo: user.photo,
         role: user.role,
         timestamp: new Date(),
       });
@@ -80,7 +80,6 @@ async function run() {
     app.post("/tutors", async (req, res) => {
       const tutorData = req.body;
       const result = await tutorCollection.insertOne(tutorData);
-      console.log(tutorData);
       res.send(result);
     });
 
