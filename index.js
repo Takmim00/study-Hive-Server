@@ -27,6 +27,7 @@ async function run() {
     const tutorCollection = db.collection("tutors");
     const userCollection = db.collection("users");
     const metarialCollection = db.collection("metarial");
+    const bookedCollection = db.collection("booked");
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
@@ -83,11 +84,28 @@ async function run() {
       const result = await tutorCollection.insertOne(tutorData);
       res.send(result);
     });
+    app.get("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tutorCollection.findOne(query);
+      res.send(result);
+    });
     app.get("/tutors/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const sessions = await tutorCollection.find(query).toArray();
       res.send(sessions);
+    });
+
+    //booked
+    app.get("/booked", async (req, res) => {
+      const result = await bookedCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/booked", async (req, res) => {
+      const bookedData = req.body;
+      const result = await bookedCollection.insertOne(bookedData);
+      res.send(result);
     });
 
     app.get("/metarial", async (req, res) => {
