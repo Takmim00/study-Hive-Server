@@ -97,17 +97,6 @@ async function run() {
       res.send(sessions);
     });
 
-    //booked
-    app.get("/booked", async (req, res) => {
-      const result = await bookedCollection.find().toArray();
-      res.send(result);
-    });
-    app.post("/booked", async (req, res) => {
-      const bookedData = req.body;
-      const result = await bookedCollection.insertOne(bookedData);
-      res.send(result);
-    });
-
     app.get("/metarial", async (req, res) => {
       const result = await metarialCollection.find().toArray();
       res.send(result);
@@ -147,6 +136,29 @@ async function run() {
       const result = await tutorCollection.updateOne(query, updated, options);
 
       res.send(result);
+    });
+
+    //booked
+    app.get("/booked", async (req, res) => {
+      const result = await bookedCollection.find().toArray();
+      res.send(result);
+    });
+    app.get("/booked/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bookedCollection.findOne(query);
+      res.send(result);
+    });
+    app.post("/booked", async (req, res) => {
+      const bookedData = req.body;
+      const result = await bookedCollection.insertOne(bookedData);
+      res.send(result);
+    });
+    app.get("/booked/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { bookedEmail: email };
+      const sessions = await tutorCollection.find(query).toArray();
+      res.send(sessions);
     });
 
     // Send a ping to confirm a successful connection
