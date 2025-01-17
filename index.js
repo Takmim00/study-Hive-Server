@@ -28,6 +28,7 @@ async function run() {
     const userCollection = db.collection("users");
     const metarialCollection = db.collection("metarial");
     const bookedCollection = db.collection("booked");
+    const reviewCollection = db.collection("reviews");
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
@@ -161,6 +162,15 @@ async function run() {
       res.send(sessions);
     });
 
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/reviews", async (req, res) => {
+      const reviewData = req.body;
+      const result = await reviewCollection.insertOne(reviewData);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
