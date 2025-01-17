@@ -85,10 +85,8 @@ async function run() {
     });
     app.get("/tutors/:email", async (req, res) => {
       const email = req.params.email;
-      const query ={ email: email } 
-      const sessions = await tutorCollection
-        .find(query)
-        .toArray();
+      const query = { email: email };
+      const sessions = await tutorCollection.find(query).toArray();
       res.send(sessions);
     });
 
@@ -105,9 +103,7 @@ async function run() {
     app.get("/veiwMetarial", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
-      const result = await tutorCollection
-        .find(query)
-        .toArray();
+      const result = await tutorCollection.find(query).toArray();
       res.send(result);
     });
     app.delete("/tutors/:id", async (req, res) => {
@@ -116,7 +112,24 @@ async function run() {
       const result = await tutorCollection.deleteOne(query);
       res.send(result);
     });
+    app.get("/veiwMetarial/tutors/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tutorCollection.findOne(query);
+      res.send(result);
+    });
+    app.put("/updateMetarials/:id", async (req, res) => {
+      const id = req.params.id;
+      const tutorData = req.body;
+      const updated = {
+        $set: tutorData,
+      };
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const result = await tutorCollection.updateOne(query, updated, options);
 
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
