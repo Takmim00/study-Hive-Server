@@ -153,14 +153,15 @@ async function run() {
     });
     app.post("/booked", async (req, res) => {
       const bookedData = req.body;
+      console.log(bookedData);
       const result = await bookedCollection.insertOne(bookedData);
       res.send(result);
     });
-    app.get("/booked/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { bookedEmail: email };
-      const sessions = await tutorCollection.find(query).toArray();
-      res.send(sessions);
+    app.get("/viewBooked", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await bookedCollection.find(query).toArray();
+      res.send(result);
     });
 
     app.get("/reviews", async (req, res) => {
@@ -221,6 +222,7 @@ async function run() {
 
       res.send(result);
     });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
