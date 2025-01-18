@@ -171,6 +171,12 @@ async function run() {
       const result = await reviewCollection.insertOne(reviewData);
       res.send(result);
     });
+    app.get("/reviews", async (req, res) => {
+      const sessionId = req.query;
+      const query = {sessionId: sessionId };
+      const result = await reviewCollection.findOne(query);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
