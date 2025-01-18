@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
@@ -107,6 +108,14 @@ async function run() {
       const tutorData = req.body;
       const result = await metarialCollection.insertOne(tutorData);
       res.send(result);
+    });
+
+    app.get("/metarials/:sessionTitle", async (req, res) => {
+      const sessionTitle = req.params.sessionTitle;
+      const query = { sessionTitle: sessionTitle };
+      const materials = await metarialCollection.find(query).toArray();
+
+      res.send(materials);
     });
 
     app.get("/veiwMetarial", async (req, res) => {
@@ -222,7 +231,23 @@ async function run() {
 
       res.send(result);
     });
+    // create payment intent
+    // app.post("/create-payment-intent", async (req, res) => {
+    //   const { registrationFee } = req.body;
 
+    //   const fee = parseInt(registrationFee * 100);
+    //   console.log(fee);
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: fee,
+    //     currency: "usd",
+    //     payment_method_types: {
+    //       enabled: true,
+    //     },
+    //   });
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret,
+    //   });
+    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
