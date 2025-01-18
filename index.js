@@ -189,6 +189,14 @@ async function run() {
       const result = await noteCollection.insertOne(noteData);
       res.send(result);
     });
+    app.get("/veiwNotes", async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        studentEmail: email,
+      };
+      const result = await noteCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
