@@ -92,7 +92,7 @@ async function run() {
       const result = await tutorCollection.findOne(query);
       res.send(result);
     });
-    app.get("/tutors/:email", async (req, res) => {
+    app.get("/veiwSession/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const sessions = await tutorCollection.find(query).toArray();
