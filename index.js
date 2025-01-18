@@ -203,6 +203,24 @@ async function run() {
       const result = await noteCollection.deleteOne(query);
       res.send(result);
     });
+    app.get("/veiwNotes/notes/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await noteCollection.findOne(query);
+      res.send(result);
+    });
+    app.put("/updateNotes/:id", async (req, res) => {
+      const id = req.params.id;
+      const noteData = req.body;
+      const updated = {
+        $set: noteData,
+      };
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const result = await noteCollection.updateOne(query, updated, options);
+
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
