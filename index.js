@@ -182,10 +182,10 @@ async function run() {
       const result = await reviewCollection.insertOne(reviewData);
       res.send(result);
     });
-    app.get("/reviews", async (req, res) => {
-      const sessionId = req.query;
+    app.get("/review/session/:sessionId", async (req, res) => {
+      const sessionId = req.params.sessionId;
       const query = { sessionId: sessionId };
-      const result = await reviewCollection.findOne(query);
+      const result = await reviewCollection.find(query).toArray();
       res.send(result);
     });
 
