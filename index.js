@@ -162,7 +162,7 @@ async function run() {
     });
     app.post("/booked", async (req, res) => {
       const bookedData = req.body;
-      console.log(bookedData);
+
       const result = await bookedCollection.insertOne(bookedData);
       res.send(result);
     });
@@ -232,22 +232,23 @@ async function run() {
       res.send(result);
     });
     // create payment intent
-    // app.post("/create-payment-intent", async (req, res) => {
-    //   const { registrationFee } = req.body;
+    app.post("/create-payment-intent", async (req, res) => {
+      const { registrationFee } = req.body;
+      if (!registrationFee || isNaN(registrationFee)) {
+        return res.status(400).send({ error: "Invalid registration fee." });
+      }
 
-    //   const fee = parseInt(registrationFee * 100);
-    //   console.log(fee);
-    //   const paymentIntent = await stripe.paymentIntents.create({
-    //     amount: fee,
-    //     currency: "usd",
-    //     payment_method_types: {
-    //       enabled: true,
-    //     },
-    //   });
-    //   res.send({
-    //     clientSecret: paymentIntent.client_secret,
-    //   });
-    // });
+      const fee = Math.round(registrationFee * 100);
+
+      const { client_secret } = await stripe.paymentIntents.create({
+        amount: fee,
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      res.send({ clientSecret: client_secret });
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
