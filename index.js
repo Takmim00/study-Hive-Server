@@ -110,11 +110,10 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/metarials/:sessionTitle", async (req, res) => {
-      const sessionTitle = req.params.sessionTitle;
-      const query = { sessionTitle: sessionTitle };
+    app.get("/metarials/session/:sessionId", async (req, res) => {
+      const sessionId = req.params.sessionId;
+      const query = { sessionId: sessionId };
       const materials = await metarialCollection.find(query).toArray();
-
       res.send(materials);
     });
 
