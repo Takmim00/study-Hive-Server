@@ -49,7 +49,6 @@ async function run() {
       const user = req.body;
       const query = { email: user.email };
 
-      // Check if user already exists
       const existingUser = await userCollection.findOne(query);
       if (existingUser) {
         return res.send({ success: false, message: "User already exists." });
@@ -65,17 +64,42 @@ async function run() {
 
       res.send({ success: true, message: "User added successfully.", result });
     });
-    app.get("/users", async (req, res) => {
-      const email = req.query.email;
 
-      const user = await userCollection.findOne({ email });
-      if (!user) {
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found." });
-      }
-
-      res.send({ success: true, role: user.role });
+    app.get("/users/role/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await userCollection.findOne({ email });
+      res.send({ role: result?.role });
+    });
+    app.get("/all-users/:email", async (req, res) => {
+      const search = req.query.search;
+      const email = req.params.email;
+      // const query = { email: { $ne: email } };
+      let query = {
+        email: { $ne: email },
+        $or:[
+          {name: {
+            $regex: new RegExp(search),
+            $options: "i",
+          }},
+          {email: {
+            $regex: new RegExp(search),
+            $options: "i",
+          }},
+        ]
+        
+      };
+      const user = await userCollection.find(query).toArray();
+      res.send(user);
+    });
+    app.patch("/user/role/:email", async (req, res) => {
+      const email = req.params.email;
+      const { role } = req.body;
+      const filter = { email };
+      const updateDoc = {
+        $set: { role },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
     });
 
     app.get("/tutors", async (req, res) => {
