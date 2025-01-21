@@ -152,6 +152,12 @@ async function run() {
       const result = await metarialCollection.insertOne(tutorData);
       res.send(result);
     });
+    app.get("/veiwMetarial", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const sessions = await metarialCollection.find(query).toArray();
+      res.send(sessions);
+    });
 
     app.get("/metarials/session/:sessionId", async (req, res) => {
       const sessionId = req.params.sessionId;
@@ -160,10 +166,28 @@ async function run() {
       res.send(materials);
     });
 
-    app.get("/veiwMetarial", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
-      const result = await tutorCollection.find(query).toArray();
+    // app.get("/veiwSession", async (req, res) => {
+    //   const email = req.params.email;
+    //   const query = { email: email };
+    //   const result = await tutorCollection.find(query).toArray();
+    //   res.send(result);
+    // });
+    app.delete("/veiwMetarial/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await metarialCollection.deleteOne(query);
+      res.send(result);
+    });
+    app.put("/VeiwMetarils/:id", async (req, res) => {
+      const id = req.params.id;
+      const metarialData = req.body;
+      const updated = {
+        $set: metarialData,
+      };
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const result = await metarialCollection.updateOne(query, updated, options);
+
       res.send(result);
     });
     app.delete("/tutors/:id", async (req, res) => {
