@@ -33,8 +33,45 @@ async function run() {
     const noteCollection = db.collection("notes");
 
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
+    //verify middleware
+    const verifyAdmin = async (req, res, next) => {
+
+      const email = req.user?.email;
+      const query = { email: email };
+      const result = await userCollection.findOne(query);
+      if (!result || result?.role !== "admin")
+        return res
+          .status(403)
+          .send({ message: "Forbidden Access! Admin Only Actions!" });
+
+      next();
+    };
+    const verifyStudent = async (req, res, next) => {
+
+      const email = req.user?.email
+      const query = { email }
+      const result = await userCollection.findOne(query)
+      if (!result || result?.role !== 'student')
+        return res
+          .status(403)
+          .send({ message: 'Forbidden Access! student Only Actions!' })
+
+      next()
+    }
+    const verifyTutor = async (req, res, next) => {
+ 
+      const email = req.user?.email
+      const query = { email }
+      const result = await userCollection.findOne(query)
+      if (!result || result?.role !== 'tutor')
+        return res
+          .status(403)
+          .send({ message: 'Forbidden Access! tutor Only Actions!' })
+
+      next()
+    }
     //jwt
     app.post("/jwt", async (req, res) => {
       const user = req.body;
@@ -64,7 +101,7 @@ async function run() {
 
       res.send({ success: true, message: "User added successfully.", result });
     });
-    app.get("/users", async (req, res) => {
+    app.get("/users",  async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
@@ -124,7 +161,7 @@ async function run() {
       const result = await tutorCollection.findOne(query);
       res.send(result);
     });
-    app.put("/tutors/:id", async (req, res) => {
+    app.put("/tutors/:id",async (req, res) => {
       const id = req.params.id;
       const { status, registrationFee } = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -170,12 +207,7 @@ async function run() {
       res.send(materials);
     });
 
-    // app.get("/veiwSession", async (req, res) => {
-    //   const email = req.params.email;
-    //   const query = { email: email };
-    //   const result = await tutorCollection.find(query).toArray();
-    //   res.send(result);
-    // });
+
     app.delete("/veiwMetarial/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -190,7 +222,11 @@ async function run() {
       };
       const query = { _id: new ObjectId(id) };
       const options = { upsert: true };
-      const result = await metarialCollection.updateOne(query, updated, options);
+      const result = await metarialCollection.updateOne(
+        query,
+        updated,
+        options
+      );
 
       res.send(result);
     });
@@ -260,7 +296,7 @@ async function run() {
     });
 
     //note
-    app.get("/notes", async (req, res) => {
+    app.get("/notes", verifyStudent,async (req, res) => {
       const result = await noteCollection.find().toArray();
       res.send(result);
     });
@@ -269,7 +305,7 @@ async function run() {
       const result = await noteCollection.insertOne(noteData);
       res.send(result);
     });
-    app.get("/veiwNotes", async (req, res) => {
+    app.get("/veiwNotes",verifyStudent, async (req, res) => {
       const email = req.query.email;
       const query = {
         studentEmail: email,
@@ -321,10 +357,10 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
