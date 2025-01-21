@@ -76,17 +76,20 @@ async function run() {
       // const query = { email: { $ne: email } };
       let query = {
         email: { $ne: email },
-        $or:[
-          {name: {
-            $regex: new RegExp(search),
-            $options: "i",
-          }},
-          {email: {
-            $regex: new RegExp(search),
-            $options: "i",
-          }},
-        ]
-        
+        $or: [
+          {
+            name: {
+              $regex: new RegExp(search),
+              $options: "i",
+            },
+          },
+          {
+            email: {
+              $regex: new RegExp(search),
+              $options: "i",
+            },
+          },
+        ],
       };
       const user = await userCollection.find(query).toArray();
       res.send(user);
@@ -115,6 +118,22 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await tutorCollection.findOne(query);
+      res.send(result);
+    });
+    app.put("/tutors/:id", async (req, res) => {
+      const id = req.params.id;
+      const { status, registrationFee } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateData = {
+        $set: {
+          status,
+          registrationFee,
+        },
+      };
+      const result = await tutorCollection.updateOne(filter, updateData, {
+        upsert: true,
+      });
+
       res.send(result);
     });
     app.get("/veiwSession/:email", async (req, res) => {
