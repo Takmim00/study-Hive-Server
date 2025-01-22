@@ -38,7 +38,6 @@ async function run() {
 
     //verify middleware
     const verifyAdmin = async (req, res, next) => {
-
       const email = req.user?.email;
       const query = { email: email };
       const result = await userCollection.findOne(query);
@@ -50,29 +49,27 @@ async function run() {
       next();
     };
     const verifyStudent = async (req, res, next) => {
-
-      const email = req.user?.email
-      const query = { email }
-      const result = await userCollection.findOne(query)
-      if (!result || result?.role !== 'student')
+      const email = req.user?.email;
+      const query = { email };
+      const result = await userCollection.findOne(query);
+      if (!result || result?.role !== "student")
         return res
           .status(403)
-          .send({ message: 'Forbidden Access! student Only Actions!' })
+          .send({ message: "Forbidden Access! student Only Actions!" });
 
-      next()
-    }
+      next();
+    };
     const verifyTutor = async (req, res, next) => {
- 
-      const email = req.user?.email
-      const query = { email }
-      const result = await userCollection.findOne(query)
-      if (!result || result?.role !== 'tutor')
+      const email = req.user?.email;
+      const query = { email };
+      const result = await userCollection.findOne(query);
+      if (!result || result?.role !== "tutor")
         return res
           .status(403)
-          .send({ message: 'Forbidden Access! tutor Only Actions!' })
+          .send({ message: "Forbidden Access! tutor Only Actions!" });
 
-      next()
-    }
+      next();
+    };
     //jwt
     app.post("/jwt", async (req, res) => {
       const user = req.body;
@@ -102,7 +99,7 @@ async function run() {
 
       res.send({ success: true, message: "User added successfully.", result });
     });
-    app.get("/users",  async (req, res) => {
+    app.get("/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
@@ -162,7 +159,7 @@ async function run() {
       const result = await tutorCollection.findOne(query);
       res.send(result);
     });
-    app.put("/tutors/:id",async (req, res) => {
+    app.put("/tutors/:id", async (req, res) => {
       const id = req.params.id;
       const { status, registrationFee } = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -208,7 +205,6 @@ async function run() {
       const materials = await metarialCollection.find(query).toArray();
       res.send(materials);
     });
-
 
     app.delete("/veiwMetarial/:id", async (req, res) => {
       const id = req.params.id;
@@ -298,7 +294,7 @@ async function run() {
     });
 
     //note
-    app.get("/notes", verifyStudent,async (req, res) => {
+    app.get("/notes", verifyStudent, async (req, res) => {
       const result = await noteCollection.find().toArray();
       res.send(result);
     });
@@ -307,7 +303,7 @@ async function run() {
       const result = await noteCollection.insertOne(noteData);
       res.send(result);
     });
-    app.get("/veiwNotes",verifyStudent, async (req, res) => {
+    app.get("/veiwNotes", verifyStudent, async (req, res) => {
       const email = req.query.email;
       const query = {
         studentEmail: email,
@@ -340,8 +336,7 @@ async function run() {
       res.send(result);
     });
 
-    
-    app.get("/rejects", verifyStudent,async (req, res) => {
+    app.get("/rejects", async (req, res) => {
       const result = await rejectCollection.find().toArray();
       res.send(result);
     });
@@ -350,6 +345,13 @@ async function run() {
       const result = await rejectCollection.insertOne(rejectData);
       res.send(result);
     });
+    app.get("/rejects/:sessionId", async (req, res) => {
+      const sessionId = req.params.sessionId;
+      const query = { sessionId: sessionId };
+      const result = await rejectCollection.findOne(query);
+      res.send(result);
+    });
+
     // create payment intent
     app.post("/create-payment-intent", async (req, res) => {
       const { registrationFee } = req.body;
