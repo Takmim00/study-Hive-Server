@@ -31,6 +31,7 @@ async function run() {
     const bookedCollection = db.collection("booked");
     const reviewCollection = db.collection("reviews");
     const noteCollection = db.collection("notes");
+    const rejectCollection = db.collection("rejects");
 
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
@@ -174,6 +175,7 @@ async function run() {
       const result = await tutorCollection.updateOne(filter, updateData, {
         upsert: true,
       });
+      console.log(result);
 
       res.send(result);
     });
@@ -335,6 +337,17 @@ async function run() {
       const options = { upsert: true };
       const result = await noteCollection.updateOne(query, updated, options);
 
+      res.send(result);
+    });
+
+    
+    app.get("/rejects", verifyStudent,async (req, res) => {
+      const result = await rejectCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/rejects", async (req, res) => {
+      const rejectData = req.body;
+      const result = await rejectCollection.insertOne(rejectData);
       res.send(result);
     });
     // create payment intent
