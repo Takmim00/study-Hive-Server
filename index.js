@@ -383,7 +383,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("studyHive is running");
+  res.send("studyHive is runningg");
 });
 
 app.listen(port, () => {
