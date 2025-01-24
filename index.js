@@ -112,7 +112,6 @@ async function run() {
     app.get("/all-users/:email", async (req, res) => {
       const search = req.query.search;
       const email = req.params.email;
-      // const query = { email: { $ne: email } };
       let query = {
         email: { $ne: email },
         $or: [
@@ -303,7 +302,7 @@ async function run() {
       const result = await noteCollection.insertOne(noteData);
       res.send(result);
     });
-    app.get("/veiwNotes", verifyStudent, async (req, res) => {
+    app.get("/veiwNotes",  async (req, res) => {
       const email = req.query.email;
       const query = {
         studentEmail: email,
