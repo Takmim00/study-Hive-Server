@@ -36,6 +36,14 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
+    app.get("/admin-stats", async (rq, res) => {
+      const user = await userCollection.estimatedDocumentCount();
+      const booked = await bookedCollection.estimatedDocumentCount();
+      const metarials = await metarialCollection.estimatedDocumentCount();
+
+      res.send({ user, booked, metarials });
+    });
+
     //verify middleware
     const verifyAdmin = async (req, res, next) => {
       const email = req.user?.email;
@@ -144,13 +152,18 @@ async function run() {
     });
 
     app.get("/tutors/limit", async (req, res) => {
-      const tutor =  tutorCollection.find().limit(7)
+      const tutor = tutorCollection.find().limit(7);
+      const result = await tutor.toArray();
+      res.send(result);
+    });
+    app.get("/tutors", async (req, res) => {
+      const tutor = tutorCollection.find();
       const result = await tutor.toArray();
       res.send(result);
     });
     app.get("/tutor", async (req, res) => {
       const search = req.query.search;
-      const sortBy = req.query.sortBy || "registrationFee"; 
+      const sortBy = req.query.sortBy || "registrationFee";
       const order = req.query.order === "desc" ? -1 : 1;
       let query = {
         sessionTitle: {
@@ -322,7 +335,7 @@ async function run() {
       const result = await noteCollection.insertOne(noteData);
       res.send(result);
     });
-    app.get("/veiwNotes",  async (req, res) => {
+    app.get("/veiwNotes", async (req, res) => {
       const email = req.query.email;
       const query = {
         studentEmail: email,
