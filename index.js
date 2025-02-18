@@ -143,8 +143,28 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/tutors", async (req, res) => {
-      const result = await tutorCollection.find().toArray();
+    app.get("/tutors/limit", async (req, res) => {
+      const tutor =  tutorCollection.find().limit(7)
+      const result = await tutor.toArray();
+      res.send(result);
+    });
+    app.get("/tutor", async (req, res) => {
+      const search = req.query.search;
+      const sortBy = req.query.sortBy || "registrationFee"; 
+      const order = req.query.order === "desc" ? -1 : 1;
+      let query = {
+        sessionTitle: {
+          $regex: new RegExp(search),
+          $options: "i",
+        },
+      };
+      const sortOptions = {};
+      if (sortBy) {
+        sortOptions[sortBy] = order;
+      }
+
+      const cursor = tutorCollection.find(query).sort(sortOptions);
+      const result = await cursor.toArray();
       res.send(result);
     });
     app.post("/tutors", async (req, res) => {
